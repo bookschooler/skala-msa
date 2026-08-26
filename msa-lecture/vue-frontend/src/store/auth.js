@@ -4,12 +4,21 @@ import { authApi } from '@/api/auth.js'
 
 const AUTH_SERVER_URL = import.meta.env.VITE_AUTH_SERVER_URL || 'http://localhost:8080'
 
+function readStoredUser() {
+  try {
+    return JSON.parse(sessionStorage.getItem('user') || 'null')
+  } catch {
+    sessionStorage.removeItem('user')
+    return null
+  }
+}
+
 export const useAuthStore = defineStore('auth', () => {
   const accessToken = ref(sessionStorage.getItem('access_token') || null)
-  const user = ref(JSON.parse(sessionStorage.getItem('user') || 'null'))
+  const user = ref(readStoredUser())
 
   const isAuthenticated = computed(() => !!accessToken.value)
-  const isInstructor = computed(() => user.value?.role === 'INSTRUCTOR')
+  const isInstructor = computed(() => ['INSTRUCTOR', 'ADMIN'].includes(user.value?.role))
 
   function setToken(token) {
     accessToken.value = token
@@ -19,6 +28,17 @@ export const useAuthStore = defineStore('auth', () => {
   function setUser(userData) {
     user.value = userData
     sessionStorage.setItem('user', JSON.stringify(userData))
+  }
+
+  function loginAsDemo() {
+    setToken('demo-token')
+    setUser({
+      id: 1001,
+      name: '김모아',
+      email: 'demo@moa.go.kr',
+      role: 'APPLICANT',
+      interestRegions: ['서울특별시', '경기도']
+    })
   }
 
   async function fetchUser() {
@@ -51,19 +71,31 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // OAuth2 Authorization Code Flow
-  function redirectToLogin() {
+  async function redirectToLogin() {
+    const verifierBytes = crypto.getRandomValues(new Uint8Array(32))
+    const verifier = Array.from(verifierBytes, byte => byte.toString(16).padStart(2, '0')).join('')
+    const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(verifier))
+    const challenge = btoa(String.fromCharCode(...new Uint8Array(digest)))
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '')
+    sessionStorage.setItem('pkce_verifier', verifier)
+
     const params = new URLSearchParams({
       response_type: 'code',
       client_id: import.meta.env.VITE_CLIENT_ID,
       redirect_uri: import.meta.env.VITE_REDIRECT_URI,
-      scope: 'openid profile read write'
+      scope: 'openid profile read write',
+      code_challenge: challenge,
+      code_challenge_method: 'S256'
     })
 
     window.location.href = `${AUTH_SERVER_URL}/oauth2/authorize?${params.toString()}`
   }
 
   async function handleCallback(code) {
-    const res = await authApi.exchangeCode(code)
+    const verifier = sessionStorage.getItem('pkce_verifier')
+    const res = await authApi.exchangeCode(code, verifier)
     console.log('[AuthStore] token response =', res.data)
 
     const token = res?.data?.access_token
@@ -73,6 +105,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     setToken(token)
+    sessionStorage.removeItem('pkce_verifier')
     await fetchUser()
   }
 
@@ -83,6 +116,7 @@ export const useAuthStore = defineStore('auth', () => {
     isInstructor,
     setToken,
     setUser,
+    loginAsDemo,
     fetchUser,
     logout,
     redirectToLogin,

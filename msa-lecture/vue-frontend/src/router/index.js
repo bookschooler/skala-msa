@@ -2,44 +2,19 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/store/auth.js'
 
 const routes = [
+  { path: '/', name: 'Home', component: () => import('@/views/HomeView.vue') },
+  { path: '/announcements', name: 'AnnouncementList', component: () => import('@/views/AnnouncementListView.vue') },
+  { path: '/announcements/:id(\\d+)', name: 'AnnouncementDetail', component: () => import('@/views/AnnouncementDetailView.vue') },
   {
-    path: '/',
-    name: 'Landing',
-    component: () => import('@/views/LandingView.vue')
-  },
-  {
-    path: '/login',
-    name: 'Login',
-    component: () => import('@/views/LoginView.vue'),
-    meta: { guestOnly: true }
-  },
-  {
-    path: '/callback',
-    name: 'Callback',
-    component: () => import('@/views/CallbackView.vue')
-  },
-  {
-    path: '/courses',
-    name: 'CourseList',
-    component: () => import('@/views/CourseListView.vue'),
+    path: '/apply/:id(\\d+)',
+    name: 'ApplicationWizard',
+    component: () => import('@/views/ApplicationWizardView.vue'),
     meta: { requiresAuth: true }
   },
   {
-    path: '/courses/new',
-    name: 'CourseCreate',
-    component: () => import('@/views/CourseCreateView.vue'),
-    meta: { requiresAuth: true, instructorOnly: true }
-  },
-  {
-    path: '/courses/:id(\\d+)',
-    name: 'CourseDetail',
-    component: () => import('@/views/CourseDetailView.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/enrollments',
-    name: 'Enrollment',
-    component: () => import('@/views/EnrollmentView.vue'),
+    path: '/applications',
+    name: 'MyApplications',
+    component: () => import('@/views/MyApplicationsView.vue'),
     meta: { requiresAuth: true }
   },
   {
@@ -47,7 +22,13 @@ const routes = [
     name: 'MyPage',
     component: () => import('@/views/MyPageView.vue'),
     meta: { requiresAuth: true }
-  }
+  },
+  { path: '/login', name: 'Login', component: () => import('@/views/LoginView.vue'), meta: { guestOnly: true } },
+  { path: '/callback', name: 'Callback', component: () => import('@/views/CallbackView.vue') },
+  { path: '/courses', redirect: '/announcements' },
+  { path: '/courses/:id(\\d+)', redirect: to => `/announcements/${to.params.id}` },
+  { path: '/enrollments', redirect: '/applications' },
+  { path: '/:pathMatch(.*)*', redirect: '/' }
 ]
 
 const router = createRouter({
@@ -58,21 +39,12 @@ const router = createRouter({
   }
 })
 
-// 인증/권한 가드
-router.beforeEach((to) => {
+router.beforeEach(to => {
   const auth = useAuthStore()
-
   if (to.meta.requiresAuth && !auth.isAuthenticated) {
-    return { name: 'Login' }
+    return { name: 'Login', query: { redirect: to.fullPath } }
   }
-
-  if (to.meta.guestOnly && auth.isAuthenticated) {
-    return { name: 'CourseList' }
-  }
-
-  if (to.meta.instructorOnly && auth.user?.role !== 'INSTRUCTOR') {
-    return { name: 'CourseList' }
-  }
+  if (to.meta.guestOnly && auth.isAuthenticated) return { name: 'Home' }
 })
 
 export default router

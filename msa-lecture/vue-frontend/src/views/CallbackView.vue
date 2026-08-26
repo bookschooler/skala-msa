@@ -47,7 +47,7 @@ onMounted(async () => {
   try {
     await auth.handleCallback(code)
     message.value = '로그인 완료! 이동 중입니다...'
-    router.replace('/courses')
+    router.replace('/')
   } catch (err) {
     console.error('OAuth callback 처리 실패:', err)
     message.value = '로그인 처리에 실패했습니다.'
@@ -62,7 +62,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--color-bg-secondary);
+  background: var(--surface-subtle);
 }
 
 .callback-box {
@@ -71,15 +71,15 @@ onMounted(async () => {
   flex-direction: column;
   align-items: center;
   gap: 16px;
-  color: var(--color-text-secondary);
+  color: var(--ink-muted);
   font-size: 15px;
 }
 
 .spinner {
   width: 40px;
   height: 40px;
-  border: 3px solid var(--color-border);
-  border-top-color: var(--color-primary);
+  border: 3px solid var(--border);
+  border-top-color: var(--primary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
