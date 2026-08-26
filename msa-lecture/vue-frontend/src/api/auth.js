@@ -4,18 +4,17 @@ import axios from 'axios'
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080'
 
 export const authApi = {
-  // OAuth2 Authorization Code -> Access Token 교환
-  // CLIENT_SECRET_BASIC: Authorization 헤더에 client_id:client_secret을 Base64로 인코딩
-  exchangeCode(code) {
+  // 공개 클라이언트용 Authorization Code + PKCE 토큰 교환
+  exchangeCode(code, codeVerifier) {
     const clientId = import.meta.env.VITE_CLIENT_ID
-    const clientSecret = import.meta.env.VITE_CLIENT_SECRET
     const redirectUri = import.meta.env.VITE_REDIRECT_URI
-    const credentials = btoa(`${clientId}:${clientSecret}`)
 
     const body = new URLSearchParams({
       grant_type: 'authorization_code',
       code,
-      redirect_uri: redirectUri
+      redirect_uri: redirectUri,
+      client_id: clientId,
+      code_verifier: codeVerifier || ''
     })
 
     return axios.post(
@@ -23,8 +22,7 @@ export const authApi = {
       body.toString(),
       {
         headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': `Basic ${credentials}`
+          'Content-Type': 'application/x-www-form-urlencoded'
         }
       }
     )
