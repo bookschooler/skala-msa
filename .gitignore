@@ -1,0 +1,40 @@
+.DS_Store
+**/.DS_Store
+
+# Environment files and local secrets
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+
+# Frontend dependencies and build output
+**/node_modules/
+**/dist/
+**/*.zip
+
+# Gradle and Java build output
+**/.gradle/
+**/build/
+**/out/
+**/bin/
+**/.idea/
+**/.vscode/
+**/*.iml
+
+# Large local training images
+**/*.tar
+**/*.tar.gz
+
+# Logs and temporary files
+**/*.log
+**/tmp/
+**/.cache/
+
+# Python virtual environments and caches
+**/.venv/
+**/venv/
+**/__pycache__/
+**/.pytest_cache/
+**/*.py[cod]
