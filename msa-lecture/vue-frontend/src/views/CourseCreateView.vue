@@ -158,7 +158,8 @@ const categoryOptions = [
   { label: '백엔드', value: 'BACKEND' },
   { label: '프론트엔드', value: 'FRONTEND' },
   { label: 'DevOps', value: 'DEVOPS' },
-  { label: 'AI / 데이터', value: 'DATA_SCIENCE' }
+  { label: '데이터', value: 'DATA' },
+  { label: 'AI', value: 'AI' }
 ]
 
 function handleLogout() {
