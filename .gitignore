@@ -38,3 +38,6 @@
 **/__pycache__/
 **/.pytest_cache/
 **/*.py[cod]
+
+# Local planning and personal notes
+PLAN/
