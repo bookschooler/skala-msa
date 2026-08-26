@@ -91,12 +91,28 @@ for n in picked:
         label = re.sub(r'^0+', '', ty.split('.')[0]) + (ty[-1] if ty and ty[-1].isalpha() else '')
         rows.append({
             "title": f"{n['HOUSE_NM']} {label}"[:255],
-            "description": (f"[출처: 한국부동산원 청약홈 공공데이터] "
-                            f"{n.get('HSSPLY_ADRES','')} / 공급면적 {area}㎡ / "
-                            f"총 {n.get('TOT_SUPLY_HSHLDCO','?')}세대 / "
-                            f"모집공고 {n.get('RCRIT_PBLANC_DE','')} / "
-                            f"접수 {n.get('RCEPT_BGNDE','')}~{n.get('RCEPT_ENDDE','')} / "
-                            f"{n.get('PBLANC_URL','')}"),
+            # description 에는 화면이 필요한 값을 JSON 으로 담습니다.
+            # (courses 스키마를 못 바꾸므로. 프로즈를 정규식으로 파싱하는 것보다 안전합니다)
+            "description": json.dumps({
+                "source":      "APPLY_HOME",
+                "sourceLabel": "청약홈",
+                "summary":     f"{n.get('HSSPLY_ADRES','')} · 전용 {area}㎡ · 총 {n.get('TOT_SUPLY_HSHLDCO','?')}세대",
+                "housingType": "공공분양" if n.get("HOUSE_DTL_SECD_NM") == "국민" else "민영분양",
+                "supplyType":  n.get("RENT_SECD_NM") or "분양주택",
+                "region":      n["_region"],
+                "address":     n.get("HSSPLY_ADRES", ""),
+                "unitType":    label,
+                "areaM2":      area,
+                "totalUnits":  n.get("TOT_SUPLY_HSHLDCO"),
+                "announcementDate": n.get("RCRIT_PBLANC_DE"),
+                "applyStart":  n.get("RCEPT_BGNDE"),
+                "applyEnd":    n.get("RCEPT_ENDDE"),
+                "resultDate":  n.get("PRZWNER_PRESNATN_DE"),
+                "moveInYm":    n.get("MVN_PREARNGE_YM"),
+                "contact":     n.get("MDHS_TELNO"),
+                "builder":     n.get("CNSTRCT_ENTRPS_NM"),
+                "detailUrl":   n.get("PBLANC_URL"),
+            }, ensure_ascii=False),
             "category": REGION[n["_region"]],
             "price": int(price),
             "instructor_id": n["_supplierId"],
@@ -111,12 +127,23 @@ lh_added = 0
 for r in ds:
     cat = next((v for k, v in LH_REGION.items() if k in (r.get("CNP_CD_NM") or "")), None)
     if not cat: continue
+    dot = lambda v: (v or "").replace(".", "-")   # LH 는 "2026.08.26" 형식
     rows.append({
         "title": (r.get("PAN_NM") or "")[:255],
-        "description": (f"[출처: 한국토지주택공사 공공데이터] "
-                        f"{r.get('CNP_CD_NM','')} / {r.get('AIS_TP_CD_NM','')} / "
-                        f"공고 {r.get('PAN_NT_ST_DT','')} / 마감 {r.get('CLSG_DT','')} / "
-                        f"{r.get('DTL_URL','')}"),
+        "description": json.dumps({
+            "source":      "LH_PLUS",
+            "sourceLabel": "LH청약플러스",
+            "summary":     f"{r.get('CNP_CD_NM','')} · {r.get('AIS_TP_CD_NM','')}",
+            "housingType": "공공분양",
+            "supplyType":  r.get("AIS_TP_CD_NM") or "분양주택",
+            "region":      next((k for k in LH_REGION if k in (r.get("CNP_CD_NM") or "")), ""),
+            "address":     r.get("CNP_CD_NM", ""),
+            "announcementDate": dot(r.get("PAN_NT_ST_DT")),
+            "applyStart":  dot(r.get("PAN_NT_ST_DT")),
+            "applyEnd":    dot(r.get("CLSG_DT")),
+            "noticeStatus": r.get("PAN_SS"),
+            "detailUrl":   r.get("DTL_URL"),
+        }, ensure_ascii=False),
         "category": cat,
         "price": 0,                    # LH 목록 API 에는 분양가가 없습니다
         "instructor_id": 101,          # 한국토지주택공사

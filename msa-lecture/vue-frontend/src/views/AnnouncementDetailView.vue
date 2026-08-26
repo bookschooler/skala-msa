@@ -29,12 +29,12 @@
         <div class="detail-content">
           <section class="summary-panel panel">
             <dl>
-              <div><dt>공급지역</dt><dd>{{ announcement.region }} {{ announcement.district }}</dd></div>
+              <div><dt>공급지역</dt><dd>{{ announcement.region }}</dd></div>
               <div><dt>공급유형</dt><dd>{{ announcement.supplyType }}</dd></div>
-              <div><dt>공급규모</dt><dd>총 {{ announcement.totalUnits.toLocaleString() }}세대</dd></div>
+              <div><dt>공급규모</dt><dd>{{ announcement.totalUnits ? `총 ${announcement.totalUnits.toLocaleString()}세대` : '공고문 참조' }}</dd></div>
               <div><dt>공급조건</dt><dd>{{ announcement.priceLabel }}</dd></div>
               <div><dt>접수기간</dt><dd>{{ formatKoreanDate(announcement.applyStart, true) }} ~<br>{{ formatKoreanDate(announcement.applyEnd, true) }}</dd></div>
-              <div><dt>당첨자 발표</dt><dd>{{ formatKoreanDate(announcement.resultDate, true) }}</dd></div>
+              <div v-if="announcement.resultDate"><dt>당첨자 발표</dt><dd>{{ formatKoreanDate(announcement.resultDate, true) }}</dd></div>
             </dl>
           </section>
 
@@ -48,35 +48,47 @@
             <dl class="info-list">
               <div><dt>소재지</dt><dd>{{ announcement.address }}</dd></div>
               <div><dt>공고일</dt><dd>{{ formatKoreanDate(announcement.announcementDate, true) }}</dd></div>
-              <div><dt>문의처</dt><dd>{{ announcement.contact }}</dd></div>
+              <div v-if="announcement.contact"><dt>문의처</dt><dd>{{ announcement.contact }}</dd></div>
+              <div v-if="announcement.builder"><dt>시공사</dt><dd>{{ announcement.builder }}</dd></div>
               <div><dt>공급기관</dt><dd>{{ announcement.agency }}</dd></div>
             </dl>
             <div class="notice-box"><strong>꼭 확인하세요</strong><p>본 화면의 정보는 이해를 돕기 위한 요약입니다. 청약 신청 전 반드시 원문 공고문을 확인해 주세요.</p></div>
           </section>
 
           <section id="eligibility" class="content-section panel">
-            <div class="section-heading"><span class="section-number">02</span><h2>신청자격 핵심요약</h2></div>
+            <div class="section-heading"><span class="section-number">02</span><h2>공급 구분</h2></div>
             <ul class="check-list">
-              <li v-for="item in announcement.eligibility" :key="item"><span aria-hidden="true">✓</span>{{ item }}</li>
+              <li><span aria-hidden="true">✓</span>{{ announcement.housingType }} · {{ announcement.supplyType }}</li>
+              <li><span aria-hidden="true">✓</span>공급기관 {{ announcement.agency }} ({{ announcement.supplyCategory }})</li>
+              <li><span aria-hidden="true">✓</span>공급지역 {{ announcement.region }}</li>
             </ul>
-            <p class="section-note">세부 소득·자산기준과 우선공급 조건은 공급유형에 따라 다를 수 있습니다.</p>
+            <p class="section-note">세부 소득·자산기준과 우선공급 조건은 원문 공고문을 확인해 주세요.</p>
           </section>
 
           <section id="units" class="content-section panel">
             <div class="section-heading"><span class="section-number">03</span><h2>주택형 정보</h2></div>
             <div class="table-scroll">
               <table>
-                <thead><tr><th>주택형</th><th>전용면적</th><th>공급세대</th><th>공급금액/보증금</th></tr></thead>
-                <tbody><tr v-for="unit in announcement.units" :key="unit.type"><td><strong>{{ unit.type }}</strong></td><td>{{ unit.area }}</td><td>{{ unit.count.toLocaleString() }}세대</td><td>{{ unit.price }}</td></tr></tbody>
+                <thead><tr><th>주택형</th><th>전용면적</th><th>총 공급세대</th><th>공급금액</th></tr></thead>
+                <tbody>
+                  <tr>
+                    <td><strong>{{ announcement.unitType || '-' }}</strong></td>
+                    <td>{{ announcement.areaM2 ? `${announcement.areaM2}㎡` : '-' }}</td>
+                    <td>{{ announcement.totalUnits ? `${announcement.totalUnits.toLocaleString()}세대` : '-' }}</td>
+                    <td>{{ announcement.priceLabel }}</td>
+                  </tr>
+                </tbody>
               </table>
             </div>
+            <p class="section-note">주택형별로 공고가 분리되어 있습니다. 같은 단지의 다른 주택형은 목록에서 확인하세요.</p>
           </section>
 
           <section id="documents" class="content-section panel">
-            <div class="section-heading"><span class="section-number">04</span><h2>공고문 및 첨부파일</h2></div>
-            <button type="button" class="document-row" @click="downloadNotice">
-              <span class="pdf-icon">PDF</span><span><strong>입주자모집공고문.pdf</strong><small>2.8 MB</small></span><span class="download-icon">↓</span>
-            </button>
+            <div class="section-heading"><span class="section-number">04</span><h2>원문 공고</h2></div>
+            <a v-if="announcement.detailUrl" class="document-row" :href="announcement.detailUrl" target="_blank" rel="noopener">
+              <span class="pdf-icon">WEB</span><span><strong>{{ announcement.sourceLabel }} 원문 공고 보기</strong><small>{{ announcement.title }}</small></span><span class="download-icon">↗</span>
+            </a>
+            <p v-else class="section-note">원문 링크가 제공되지 않은 공고입니다.</p>
           </section>
         </div>
 
@@ -99,14 +111,21 @@
             </template>
 
             <div class="sidebar-divider"></div>
-            <dl class="sidebar-meta"><div><dt>조회수</dt><dd>{{ announcement.views.toLocaleString() }}회</dd></div><div><dt>신청건수</dt><dd>{{ announcement.applicantCount.toLocaleString() }}건</dd></div></dl>
+            <dl class="sidebar-meta"><div><dt>공고일</dt><dd>{{ formatKoreanDate(announcement.announcementDate) }}</dd></div><div><dt>신청건수</dt><dd>{{ announcement.applicantCount.toLocaleString() }}건</dd></div></dl>
           </div>
           <div class="support-card"><span aria-hidden="true">?</span><div><strong>신청이 어려우신가요?</strong><p>청약상담 1600-1004</p></div></div>
         </aside>
       </div>
     </main>
 
-    <div v-else class="loading-state"><div class="spinner" aria-label="공고 불러오는 중"></div></div>
+    <div v-else-if="store.loading" class="loading-state"><div class="spinner" aria-label="공고 불러오는 중"></div></div>
+
+    <!-- 없는 공고 / 조회 실패: 스피너가 무한히 돌지 않도록 -->
+    <div v-else class="loading-state" style="flex-direction:column;gap:16px;text-align:center;padding:80px 20px">
+      <strong style="font-size:18px">공고를 찾을 수 없습니다</strong>
+      <p style="color:#64748b">{{ store.error || '삭제되었거나 존재하지 않는 공고입니다.' }}</p>
+      <router-link to="/announcements" class="btn btn-primary">통합공고 목록으로</router-link>
+    </div>
     <AppFooter />
   </div>
 </template>
@@ -116,7 +135,7 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
-import { formatKoreanDate, getDaysRemaining, statusMeta } from '@/data/mockAnnouncements.js'
+import { formatKoreanDate, getDaysRemaining, statusMeta } from '@/data/announcementMeta.js'
 import { useAnnouncementStore } from '@/store/announcement.js'
 import { useApplicationStore } from '@/store/application.js'
 

@@ -29,7 +29,7 @@
       <dl class="meta-grid">
         <div>
           <dt>지역</dt>
-          <dd>{{ announcement.region }} {{ announcement.district }}</dd>
+          <dd>{{ announcement.region }}</dd>
         </div>
         <div>
           <dt>접수기간</dt>
@@ -53,7 +53,7 @@
 
 <script setup>
 import { computed, ref } from 'vue'
-import { getDaysRemaining, statusMeta } from '@/data/mockAnnouncements.js'
+import { getDaysRemaining, statusMeta } from '@/data/announcementMeta.js'
 
 const props = defineProps({ announcement: { type: Object, required: true } })
 const bookmarkKey = computed(() => `bookmark_${props.announcement.id}`)

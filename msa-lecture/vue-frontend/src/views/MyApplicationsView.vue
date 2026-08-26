@@ -42,7 +42,7 @@
 import { computed, ref } from 'vue'
 import AppFooter from '@/components/AppFooter.vue'
 import AppHeader from '@/components/AppHeader.vue'
-import { formatKoreanDate } from '@/data/mockAnnouncements.js'
+import { formatKoreanDate } from '@/data/announcementMeta.js'
 import { useApplicationStore } from '@/store/application.js'
 
 const applicationStore = useApplicationStore()
