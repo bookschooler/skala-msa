@@ -2,6 +2,7 @@ package com.lecture.course.service;
 
 import com.lecture.course.dto.CourseDto;
 import com.lecture.course.entity.Course;
+import com.lecture.course.exception.CourseNotFoundException;
 import com.lecture.course.repository.CourseRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -96,6 +97,6 @@ public class CourseService {
 
     private Course findCourseById(Long id) {
         return courseRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("강의를 찾을 수 없습니다: " + id));
+                .orElseThrow(() -> new CourseNotFoundException(id));
     }
 }
