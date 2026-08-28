@@ -1,0 +1,1028 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>발표자료 정합성 점검</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=IBM+Plex+Sans+KR:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  :root {
+    --paper:      #F1F3F0;
+    --surface:    #FFFFFF;
+    --surface-2:  #F7F8F6;
+    --ink:        #182430;
+    --ink-mid:    #4C5763;
+    --ink-faint:  #7C858F;
+    --rule:       #D3D8D6;
+    --rule-soft:  #E4E8E5;
+    --navy:       #1F4E79;
+    --navy-soft:  #E7EEF5;
+    --seal:       #A6332E;
+    --seal-soft:  #F7E9E7;
+    --ochre:      #7E5A10;
+    --ochre-soft: #F6EEDC;
+    --pine:       #256450;
+    --pine-soft:  #E3F0EA;
+    --shade:      #EDF0EC;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --paper:      #12181D;
+      --surface:    #1A2128;
+      --surface-2:  #202830;
+      --ink:        #E4E8EA;
+      --ink-mid:    #A3ADB6;
+      --ink-faint:  #78838D;
+      --rule:       #333D46;
+      --rule-soft:  #29323A;
+      --navy:       #7FB2DC;
+      --navy-soft:  #1D2E3D;
+      --seal:       #E58B85;
+      --seal-soft:  #38211F;
+      --ochre:      #D9B061;
+      --ochre-soft: #332A17;
+      --pine:       #77C4A6;
+      --pine-soft:  #173028;
+      --shade:      #202830;
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --paper:      #12181D;
+    --surface:    #1A2128;
+    --surface-2:  #202830;
+    --ink:        #E4E8EA;
+    --ink-mid:    #A3ADB6;
+    --ink-faint:  #78838D;
+    --rule:       #333D46;
+    --rule-soft:  #29323A;
+    --navy:       #7FB2DC;
+    --navy-soft:  #1D2E3D;
+    --seal:       #E58B85;
+    --seal-soft:  #38211F;
+    --ochre:      #D9B061;
+    --ochre-soft: #332A17;
+    --pine:       #77C4A6;
+    --pine-soft:  #173028;
+    --shade:      #202830;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: "IBM Plex Sans KR", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", sans-serif;
+    font-weight: 400;
+    font-size: 15px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .sheet {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 24px 96px;
+  }
+
+  /* ── masthead ───────────────────────────── */
+
+  .masthead {
+    padding: 56px 0 24px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .doc-kind {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--seal);
+  }
+
+  h1 {
+    margin: 12px 0 0;
+    font-family: "Noto Serif KR", "Apple SD Gothic Neo", serif;
+    font-weight: 700;
+    font-size: clamp(30px, 5.2vw, 44px);
+    line-height: 1.28;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  .standfirst {
+    max-width: 60ch;
+    margin: 16px 0 0;
+    color: var(--ink-mid);
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  .colophon {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 32px;
+    margin-top: 28px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    line-height: 2;
+    color: var(--ink-faint);
+  }
+  .colophon b {
+    display: block;
+    color: var(--ink-mid);
+    font-weight: 600;
+  }
+
+  /* ── verdict ────────────────────────────── */
+
+  .verdict {
+    display: grid;
+    grid-template-columns: 4px 1fr;
+    gap: 0;
+    margin: 40px 0 0;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+  }
+  .verdict-mark { background: var(--seal); }
+  .verdict-body { padding: 26px 28px; }
+  .verdict h2 {
+    margin: 0;
+    font-family: "Noto Serif KR", serif;
+    font-weight: 700;
+    font-size: clamp(19px, 2.8vw, 24px);
+    line-height: 1.5;
+    text-wrap: balance;
+  }
+  .verdict p {
+    max-width: 62ch;
+    margin: 12px 0 0;
+    color: var(--ink-mid);
+    font-size: 14.5px;
+  }
+
+  .tally {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    margin-top: -1px;
+    border: 1px solid var(--rule);
+    background: var(--rule-soft);
+    gap: 1px;
+  }
+  .tally div { padding: 18px 20px; background: var(--surface); }
+  .tally dt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .tally dd {
+    margin: 6px 0 0;
+    font-family: "Noto Serif KR", serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+  }
+  .tally dd small {
+    margin-left: 4px;
+    font-family: "IBM Plex Sans KR", sans-serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--ink-faint);
+  }
+  .t-ok dd  { color: var(--pine); }
+  .t-bad dd { color: var(--seal); }
+
+  /* ── section headings ───────────────────── */
+
+  section { margin-top: 64px; }
+
+  .sec-head {
+    display: flex;
+    align-items: baseline;
+    gap: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--ink);
+  }
+  .sec-num {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    color: var(--seal);
+  }
+  .sec-head h2 {
+    margin: 0;
+    font-family: "Noto Serif KR", serif;
+    font-weight: 700;
+    font-size: clamp(20px, 3vw, 26px);
+    letter-spacing: -0.01em;
+  }
+  .sec-note {
+    max-width: 64ch;
+    margin: 16px 0 0;
+    color: var(--ink-mid);
+    font-size: 14.5px;
+  }
+
+  /* ── trace diagram ──────────────────────── */
+
+  .trace {
+    margin-top: 28px;
+    border: 1px solid var(--rule);
+    background: var(--surface);
+  }
+  .trace-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 14px 22px;
+    border-bottom: 1px solid var(--rule);
+    background: var(--surface-2);
+  }
+  .trace-title {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .trace-title.ok  { color: var(--pine); }
+  .trace-title.bad { color: var(--seal); }
+  .trace-verdict { font-size: 12.5px; color: var(--ink-mid); }
+
+  .hops { padding: 8px 0; }
+
+  .hop {
+    display: grid;
+    grid-template-columns: 76px 22px 1fr;
+    align-items: start;
+    gap: 0 14px;
+    padding: 0 22px;
+  }
+  .hop-actor {
+    padding-top: 11px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-align: right;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+  }
+  .hop-rail {
+    position: relative;
+    align-self: stretch;
+    display: flex;
+    justify-content: center;
+  }
+  .hop-rail::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 1px;
+    background: var(--rule);
+  }
+  .hop:first-child .hop-rail::before { top: 16px; }
+  .hop:last-child  .hop-rail::before { bottom: calc(100% - 16px); }
+  .hop-dot {
+    position: relative;
+    width: 9px; height: 9px;
+    margin-top: 13px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--pine);
+  }
+  .hop.is-broken .hop-dot { border-color: var(--seal); background: var(--seal); }
+  .hop.is-broken .hop-rail::before {
+    background: repeating-linear-gradient(to bottom, var(--seal) 0 4px, transparent 4px 9px);
+  }
+  .hop-body { padding: 9px 0 11px; min-width: 0; }
+  .hop-label { font-size: 14px; font-weight: 500; line-height: 1.5; }
+  .hop-meta {
+    margin-top: 3px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    line-height: 1.6;
+    color: var(--ink-faint);
+    overflow-wrap: anywhere;
+  }
+  .hop.is-broken .hop-label { color: var(--seal); }
+
+  .trace-foot {
+    padding: 14px 22px;
+    border-top: 1px solid var(--rule);
+    background: var(--seal-soft);
+    color: var(--seal);
+    font-size: 13.5px;
+    line-height: 1.65;
+  }
+  .trace-foot b { font-weight: 600; }
+
+  .trace-pair {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+    margin-top: 28px;
+  }
+  @media (min-width: 800px) {
+    .trace-pair { grid-template-columns: 1fr 1fr; gap: 20px; align-items: start; }
+    .trace-pair .trace { margin-top: 0; }
+  }
+
+  /* ── matched checklist ──────────────────── */
+
+  .matched {
+    margin-top: 24px;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .matched-row {
+    display: grid;
+    grid-template-columns: 20px 1fr;
+    gap: 0 14px;
+    align-items: start;
+    padding: 13px 4px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .tick {
+    margin-top: 4px;
+    color: var(--pine);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.2;
+  }
+  .matched-row p { margin: 0; font-size: 14.5px; line-height: 1.6; }
+  .matched-row .src {
+    display: block;
+    margin-top: 3px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    overflow-wrap: anywhere;
+  }
+
+  /* ── findings ledger ────────────────────── */
+
+  .ledger { margin-top: 28px; }
+
+  .finding {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    gap: 0 24px;
+    padding: 30px 0;
+    border-top: 1px solid var(--rule);
+  }
+  .finding:first-child { border-top: 2px solid var(--ink); }
+
+  .f-gutter { padding-top: 2px; }
+  .f-num {
+    font-family: "Noto Serif KR", serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+  }
+  .chip {
+    display: inline-block;
+    margin-top: 10px;
+    padding: 3px 7px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+  .lv-crit { color: var(--seal);  background: var(--seal-soft);  border: 1px solid var(--seal); }
+  .lv-high { color: var(--seal);  background: var(--seal-soft); }
+  .lv-mid  { color: var(--ochre); background: var(--ochre-soft); }
+  .lv-low  { color: var(--ink-mid); background: var(--shade); }
+
+  .finding.is-crit .f-num { color: var(--seal); }
+
+  .f-body { min-width: 0; }
+  .f-body h3 {
+    margin: 0;
+    font-family: "Noto Serif KR", serif;
+    font-weight: 700;
+    font-size: 19px;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  .f-body p {
+    max-width: 66ch;
+    margin: 12px 0 0;
+    font-size: 14.5px;
+    color: var(--ink-mid);
+  }
+  .f-body p strong { color: var(--ink); font-weight: 600; }
+
+  code {
+    padding: 1px 5px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 0.87em;
+    background: var(--shade);
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .evidence {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    border-left: 1px solid var(--rule);
+  }
+  .evidence li {
+    padding: 5px 0 5px 14px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    overflow-wrap: anywhere;
+  }
+  .evidence li b {
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  .against {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1px;
+    margin-top: 18px;
+    background: var(--rule);
+    border: 1px solid var(--rule);
+  }
+  @media (min-width: 660px) { .against { grid-template-columns: 1fr 1fr; } }
+  .against div { padding: 13px 16px; background: var(--surface); }
+  .against dt {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+  .against dd {
+    margin: 6px 0 0;
+    font-size: 13.5px;
+    line-height: 1.6;
+  }
+  .against .said { color: var(--navy); }
+  .against .does { color: var(--seal); }
+
+  /* ── table ──────────────────────────────── */
+
+  .table-scroll { margin-top: 24px; overflow-x: auto; border: 1px solid var(--rule); }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); }
+  th, td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--rule-soft);
+    font-size: 13.5px;
+    line-height: 1.6;
+    vertical-align: top;
+    white-space: nowrap;
+  }
+  th {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    background: var(--surface-2);
+    border-bottom: 1px solid var(--rule);
+  }
+  tbody tr:last-child td { border-bottom: 0; }
+  td.mono { font-family: "IBM Plex Mono", monospace; font-size: 12px; }
+  td.wrap { white-space: normal; min-width: 240px; }
+
+  /* ── actions ────────────────────────────── */
+
+  .actions { margin-top: 28px; counter-reset: step; }
+  .action {
+    display: grid;
+    grid-template-columns: 44px 1fr;
+    gap: 0 20px;
+    padding: 22px 0;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .action:first-child { border-top: 1px solid var(--rule); }
+  .action::before {
+    counter-increment: step;
+    content: counter(step, decimal-leading-zero);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--seal);
+    padding-top: 4px;
+  }
+  .action h3 {
+    margin: 0;
+    font-family: "Noto Serif KR", serif;
+    font-size: 17px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+  .action p {
+    max-width: 64ch;
+    margin: 8px 0 0;
+    font-size: 14px;
+    color: var(--ink-mid);
+  }
+  .action .refs {
+    margin-top: 8px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+  }
+
+  footer {
+    margin-top: 72px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    line-height: 1.9;
+    color: var(--ink-faint);
+  }
+
+  @media (max-width: 600px) {
+    .finding  { grid-template-columns: 1fr; gap: 14px; }
+    .f-gutter { display: flex; align-items: center; gap: 12px; }
+    .f-num    { font-size: 22px; }
+    .chip     { margin-top: 0; }
+    .hop      { grid-template-columns: 16px 1fr; padding: 0 16px; }
+    .hop-actor { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+
+  <header class="masthead">
+    <div class="doc-kind">정합성 점검 · 6반 6조</div>
+    <h1>발표자료와 실제 코드가<br>같은 이야기를 하고 있는가</h1>
+    <p class="standfirst">
+      통합 청약 플랫폼 PPT가 설명하는 청약 신청 흐름을, enrollment 관련 전 구간 코드와 한 줄씩 대조했습니다.
+    </p>
+    <div class="colophon">
+      <span><b>점검 대상</b>슬라이드 8·9·10·12</span>
+      <span><b>점검 범위</b>Gateway · Enrollment · Payment · Course · Recommend · Vue</span>
+      <span><b>기준 브랜치</b>feature/seunghwanfront-auth</span>
+      <span><b>점검일</b>2026-08-27</span>
+    </div>
+  </header>
+
+  <div class="verdict">
+    <div class="verdict-mark"></div>
+    <div class="verdict-body">
+      <h2>백엔드는 PPT와 정확히 일치합니다.<br>그런데 프론트엔드가 그 흐름을 쓰지 않습니다.</h2>
+      <p>
+        <code>PENDING → Kafka → ACTIVE</code> 전환은 서버에서 실제로 일어납니다. 하지만 「내 신청내역」 화면은
+        서버를 조회하지 않고 브라우저 localStorage를 읽습니다. 그래서 슬라이드 12가 약속한 시연 장면
+        &mdash; 접수 처리 중에서 접수 완료로 바뀌는 순간 &mdash; 이 현재 상태로는 재현되지 않습니다.
+      </p>
+    </div>
+  </div>
+
+  <dl class="tally">
+    <div class="t-ok"><dt>일치 확인</dt><dd>8<small>항목</small></dd></div>
+    <div class="t-bad"><dt>불일치</dt><dd>8<small>건</small></dd></div>
+    <div class="t-bad"><dt>시연 차단</dt><dd>1<small>건</small></dd></div>
+    <div><dt>발표 전 필수</dt><dd>3<small>건</small></dd></div>
+  </dl>
+
+  <!-- ═══════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">01</span>
+      <h2>흐름 대조</h2>
+    </div>
+    <p class="sec-note">
+      슬라이드 12는 <code>POST /api/enrollments → PENDING → 접수 처리 + Kafka → ACTIVE → GET /api/enrollments/my</code>
+      를 시연 시나리오로 제시합니다. 이 경로를 서버 쪽과 화면 쪽으로 나눠 추적했습니다.
+    </p>
+
+    <div class="trace-pair">
+
+      <div class="trace">
+        <div class="trace-head">
+          <span class="trace-title ok">서버 경로</span>
+          <span class="trace-verdict">PPT와 일치</span>
+        </div>
+        <div class="hops">
+          <div class="hop">
+            <div class="hop-actor">Gateway</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">JWT 검증 후 사용자 ID 주입</div>
+              <div class="hop-meta">외부 X-User-Id 제거 → 검증값으로 재설정</div>
+            </div>
+          </div>
+          <div class="hop">
+            <div class="hop-actor">Course</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">공고 존재 확인</div>
+              <div class="hop-meta">GET /api/courses/internal/exists/{id}</div>
+            </div>
+          </div>
+          <div class="hop">
+            <div class="hop-actor">Enrollment</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">PENDING 생성 · 독립 트랜잭션 즉시 커밋</div>
+              <div class="hop-meta">REQUIRES_NEW</div>
+            </div>
+          </div>
+          <div class="hop">
+            <div class="hop-actor">Payment</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">접수 처리 요청 · 동기 REST</div>
+              <div class="hop-meta">POST /api/payments/internal/request</div>
+            </div>
+          </div>
+          <div class="hop">
+            <div class="hop-actor">Kafka</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">접수 완료 이벤트 발행</div>
+              <div class="hop-meta">payment.completed</div>
+            </div>
+          </div>
+          <div class="hop">
+            <div class="hop-actor">Enrollment</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">이벤트 수신 → PENDING을 ACTIVE로 전환</div>
+              <div class="hop-meta">신청자 수 증가 + enrollment.completed 발행</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="trace">
+        <div class="trace-head">
+          <span class="trace-title bad">화면 경로</span>
+          <span class="trace-verdict">PPT와 불일치</span>
+        </div>
+        <div class="hops">
+          <div class="hop">
+            <div class="hop-actor">Wizard</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">청약 신청 제출</div>
+              <div class="hop-meta">POST /api/enrollments</div>
+            </div>
+          </div>
+          <div class="hop is-broken">
+            <div class="hop-actor">Store</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">응답을 버리고 로컬에 RECEIVED를 즉시 기록</div>
+              <div class="hop-meta">store/application.js:54</div>
+            </div>
+          </div>
+          <div class="hop is-broken">
+            <div class="hop-actor">Store</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">서버 상태를 다시 조회하지 않음</div>
+              <div class="hop-meta">getMine() 호출처 0곳</div>
+            </div>
+          </div>
+          <div class="hop is-broken">
+            <div class="hop-actor">내역화면</div>
+            <div class="hop-rail"><div class="hop-dot"></div></div>
+            <div class="hop-body">
+              <div class="hop-label">localStorage를 읽어 「접수완료」로 렌더링</div>
+              <div class="hop-meta">MyApplicationsView.vue:52</div>
+            </div>
+          </div>
+        </div>
+        <div class="trace-foot">
+          <b>결과 &mdash;</b> 화면은 신청 직후부터 계속 「접수완료」입니다.
+          Kafka가 상태를 바꾸든 말든, 심지어 서버가 꺼져 있어도 화면은 동일합니다.
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">02</span>
+      <h2>일치가 확인된 항목</h2>
+    </div>
+    <p class="sec-note">
+      슬라이드 8 아키텍처 다이어그램의 화살표와 슬라이드 10 API 목록은 실제 코드에 모두 존재합니다.
+      발표에서 그대로 말해도 되는 부분입니다.
+    </p>
+
+    <div class="matched">
+      <div class="matched-row"><span class="tick">✓</span><p>Gateway가 JWT를 검증하고 <code>X-User-Id</code>를 주입 &mdash; 프론트가 헤더를 위조할 수 없도록 기존 값을 제거 후 재설정<span class="src">api-gateway · JwtAuthenticationFilter.java:46-49</span></p></div>
+      <div class="matched-row"><span class="tick">✓</span><p>Enrollment → Course 「공고 존재 확인」 화살표<span class="src">CourseServiceClient.existsCourse()</span></p></div>
+      <div class="matched-row"><span class="tick">✓</span><p>Enrollment → Payment 「접수 처리 요청」 화살표<span class="src">PaymentServiceClient.requestPayment()</span></p></div>
+      <div class="matched-row"><span class="tick">✓</span><p>Payment → Kafka 「접수 완료 이벤트」 화살표 &mdash; 발행 성공을 10초까지 동기 확인<span class="src">PaymentKafkaProducer · topic payment.completed</span></p></div>
+      <div class="matched-row"><span class="tick">✓</span><p>Kafka → Enrollment 「상태 변경」 화살표 &mdash; PENDING에서 ACTIVE로 전환<span class="src">EnrollmentKafkaConsumer.handlePaymentCompleted()</span></p></div>
+      <div class="matched-row"><span class="tick">✓</span><p>Recommend가 신청 이력을 활용 &mdash; ACTIVE 공고 ID 목록 조회<span class="src">GET /api/enrollments/internal/history/{userId}</span></p></div>
+      <div class="matched-row"><span class="tick">✓</span><p>Eureka 서비스 등록·디스커버리, Gateway 6개 라우트 전부 존재<span class="src">api-gateway/application.yml</span></p></div>
+      <div class="matched-row"><span class="tick">✓</span><p>슬라이드 10의 주요 API 7개 모두 실제 엔드포인트로 존재<span class="src">users/me · courses · courses/category · courses/{id} · recommend/{userId} · enrollments · enrollments/my</span></p></div>
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">03</span>
+      <h2>어긋나는 항목</h2>
+    </div>
+    <p class="sec-note">
+      번호는 심각도 순이 아니라 채팅에서 공유한 순서 그대로입니다. 발표 기준 우선순위는 마지막 절에 정리했습니다.
+    </p>
+
+    <div class="ledger">
+
+      <article class="finding is-crit">
+        <div class="f-gutter">
+          <div class="f-num">1</div>
+          <span class="chip lv-crit">시연 차단</span>
+        </div>
+        <div class="f-body">
+          <h3>「내 신청내역」이 서버가 아니라 브라우저 저장소를 읽습니다</h3>
+          <p>
+            <code>getMine()</code> (= <code>GET /api/enrollments/my</code>) 은 정의만 되어 있고 <strong>호출하는 곳이 한 군데도 없습니다.</strong>
+            신청 직후 로컬에 <code>status: 'RECEIVED'</code> 를 바로 기록하기 때문에 화면은 처음부터 「접수완료」입니다.
+            슬라이드 12의 &ldquo;After 1 접수 처리 중&rdquo; 장면을 만들 수 없습니다.
+          </p>
+          <p>
+            <code>GET /api/enrollments/my</code> 를 실제로 호출하는 파일은 구버전 <code>EnrollmentView.vue</code> 인데,
+            라우터가 <code>/enrollments</code> 를 <code>/applications</code> 로 리다이렉트해서 접근 자체가 불가능합니다.
+            추가로 액세스 토큰이 <code>demo-token</code> 이면 POST조차 보내지 않습니다.
+          </p>
+          <ul class="evidence">
+            <li><b>api/application.js:5</b> — getMine() 정의, 사용처 0</li>
+            <li><b>store/application.js:47</b> — demo-token이면 서버 호출 생략</li>
+            <li><b>store/application.js:54</b> — status: 'RECEIVED' 로컬 하드코딩</li>
+            <li><b>views/MyApplicationsView.vue:48</b> — applicationStore(localStorage)만 참조</li>
+            <li><b>router/index.js</b> — /enrollments → /applications 리다이렉트</li>
+          </ul>
+          <dl class="against">
+            <div><dt>PPT가 말하는 것</dt><dd class="said">ACTIVE → GET /api/enrollments/my 로 접수 완료 확인</dd></div>
+            <div><dt>코드가 하는 것</dt><dd class="does">localStorage에서 읽은 RECEIVED를 그대로 표시</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="f-gutter">
+          <div class="f-num">2</div>
+          <span class="chip lv-high">높음</span>
+        </div>
+        <div class="f-body">
+          <h3>상태 값 체계가 프론트와 백엔드에서 서로 다릅니다</h3>
+          <p>
+            두 체계를 이어주는 매핑 코드가 없습니다. 1번을 고쳐 서버 응답을 붙이는 순간 바로 부딪히는 문제라,
+            같이 처리해야 합니다.
+          </p>
+          <div class="table-scroll">
+            <table>
+              <thead><tr><th>계층</th><th>정의 위치</th><th>상태 값</th></tr></thead>
+              <tbody>
+                <tr><td>백엔드</td><td class="mono">Enrollment.java:44-46</td><td class="mono">PENDING / ACTIVE / CANCELLED</td></tr>
+                <tr><td>프론트</td><td class="mono">MyApplicationsView.vue:52</td><td class="mono">RECEIVED / REVIEWING / SELECTED / CANCELLED</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <dl class="against">
+            <div><dt>PPT가 말하는 것</dt><dd class="said">청약 신청 내역 및 접수 상태 확인 (슬라이드 10)</dd></div>
+            <div><dt>코드가 하는 것</dt><dd class="does">겹치는 값은 CANCELLED 하나뿐</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="f-gutter">
+          <div class="f-num">3</div>
+          <span class="chip lv-high">높음</span>
+        </div>
+        <div class="f-body">
+          <h3>화면에 「신청취소」 버튼이 있는데 취소 API가 없습니다</h3>
+          <p>
+            프론트는 <code>DELETE /api/enrollments/{id}</code> 를 호출하려 하지만 <code>EnrollmentController</code> 에
+            DELETE 매핑이 없습니다. 다만 지금은 로컬 ID가 <code>AP-2026-xxxxxx</code> 문자열이라
+            <code>typeof target.id === 'number'</code> 조건에 걸리지 않아 <strong>호출 자체가 일어나지 않습니다.</strong>
+            결과적으로 화면에서만 취소되고 서버 DB에는 신청이 그대로 남습니다.
+          </p>
+          <ul class="evidence">
+            <li><b>api/application.js</b> — cancel() → DELETE /api/enrollments/{id}</li>
+            <li><b>store/application.js:72</b> — 숫자 ID일 때만 호출 (실제로는 문자열)</li>
+            <li><b>EnrollmentController.java</b> — DELETE 매핑 없음</li>
+            <li><b>MyApplicationsView.vue:28</b> — 「신청취소」 버튼 노출</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="f-gutter">
+          <div class="f-num">4</div>
+          <span class="chip lv-mid">중간</span>
+        </div>
+        <div class="f-body">
+          <h3>「접수 처리」라고 소개하지만 실제로는 99,000원이 결제됩니다</h3>
+          <p>
+            금액이 하드코딩되어 있어 <code>payments</code> 테이블에 <code>amount = 99000</code> 이 쌓입니다.
+            청약 도메인에서 의미가 없는 값이고, 공고의 분양가(<code>course.price</code>, 만원 단위)와도 무관합니다.
+            시연 중 결제 내역이나 DB를 열면 바로 드러납니다.
+          </p>
+          <ul class="evidence">
+            <li><b>EnrollmentService.java:48</b> — BigDecimal.valueOf(99000)</li>
+          </ul>
+          <dl class="against">
+            <div><dt>PPT가 말하는 것</dt><dd class="said">Payment Service — 청약 신청 이후의 접수 처리 담당</dd></div>
+            <div><dt>코드가 하는 것</dt><dd class="does">고정 99,000원 결제 레코드 생성</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="f-gutter">
+          <div class="f-num">5</div>
+          <span class="chip lv-high">높음</span>
+        </div>
+        <div class="f-body">
+          <h3>강의 도메인 잔재가 사용자 화면에 그대로 노출됩니다</h3>
+          <p>
+            <strong>중복 신청을 시연하면 &ldquo;이미 수강신청한 강의입니다&rdquo; 가 화면에 뜹니다.</strong>
+            발표 중 가장 눈에 띄는 종류의 불일치입니다.
+          </p>
+          <p>
+            카테고리도 마찬가지입니다. <code>normalizeCategory()</code> 는 <code>BACKEND → 백엔드</code> 매핑인데,
+            실제 시드 데이터는 <code>SECURITY = 서울</code>, <code>MOBILE = 경기</code>, <code>DATABASE = 인천</code> 입니다.
+            매핑을 타지 못해 <code>MOBILE</code> 이 그대로 화면에 나갑니다.
+          </p>
+          <ul class="evidence">
+            <li><b>EnrollmentService.java:39</b> — "존재하지 않는 강의입니다"</li>
+            <li><b>EnrollmentService.java:43</b> — "이미 수강신청한 강의입니다"</li>
+            <li><b>EnrollmentService.java:132-136</b> — normalizeCategory(BACKEND → 백엔드)</li>
+            <li><b>init-db/03_seed_courses.sql</b> — SECURITY=서울 / MOBILE=경기 / DATABASE=인천</li>
+          </ul>
+          <dl class="against">
+            <div><dt>PPT가 말하는 것</dt><dd class="said">지역별 공고 조회 — 선택 지역의 분양 공고 조회</dd></div>
+            <div><dt>코드가 하는 것</dt><dd class="does">강의 카테고리 매핑을 타지 못해 원본 enum 노출</dd></div>
+          </dl>
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="f-gutter">
+          <div class="f-num">6</div>
+          <span class="chip lv-low">보완 기회</span>
+        </div>
+        <div class="f-body">
+          <h3>다이어그램에 빠진 실제 흐름이 두 개 있습니다</h3>
+          <p>
+            둘 다 코드에 이미 구현되어 있는데 슬라이드 8에는 없습니다.
+            <strong>없어서 틀린 게 아니라, 넣으면 이벤트 기반 설계를 더 잘 보여줄 수 있는 쪽입니다.</strong>
+            슬라이드 9의 Kafka 설명도 「신청 상태 갱신」만 적혀 있어 함께 보완할 수 있습니다.
+          </p>
+          <ul class="evidence">
+            <li><b>Enrollment → Kafka → Recommend</b> — enrollment.completed 발행 및 소비</li>
+            <li>EnrollmentKafkaProducer.java · recommend-service/app/kafka/consumer.py</li>
+            <li><b>Enrollment → Course</b> — POST /internal/{id}/enrollment-count (신청자 수 증가)</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="f-gutter">
+          <div class="f-num">7</div>
+          <span class="chip lv-mid">시연 리스크</span>
+        </div>
+        <div class="f-body">
+          <h3>접수 처리가 한 번 실패하면 그 계정은 해당 공고에 영구히 다시 신청할 수 없습니다</h3>
+          <p>
+            PENDING 레코드는 <code>REQUIRES_NEW</code> 로 먼저 커밋됩니다. 이후 Payment 호출이 실패하면 응답은 500이지만
+            PENDING은 DB에 남습니다. 중복 검사가 상태를 가리지 않고
+            <code>(user_id, course_id)</code> 조합만 보기 때문에, 재신청은 &ldquo;이미 신청함&rdquo; 으로 막힙니다.
+          </p>
+          <p>
+            <strong>시연 중 Kafka나 Payment가 한 번 삐끗하면 DB를 직접 건드리지 않고는 복구할 수 없습니다.</strong>
+            발표 직전 시연 계정을 리셋해 두는 것으로도 당장은 대응됩니다.
+          </p>
+          <ul class="evidence">
+            <li><b>EnrollmentWriteService.java</b> — Propagation.REQUIRES_NEW</li>
+            <li><b>EnrollmentService.java:42</b> — existsByUserIdAndCourseId (상태 무관)</li>
+            <li><b>init-db/01_init.sql</b> — enrollments UNIQUE (user_id, course_id)</li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="finding">
+        <div class="f-gutter">
+          <div class="f-num">8</div>
+          <span class="chip lv-low">미완성</span>
+        </div>
+        <div class="f-body">
+          <h3>슬라이드 11 「대표 Request / Response」가 아직 빈 페이지입니다</h3>
+          <p>
+            제목만 있고 내용이 없습니다. 실제 요청·응답 예시는 코드에서 그대로 뽑아낼 수 있습니다.
+          </p>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ═══════════════════════════════════════ -->
+  <section>
+    <div class="sec-head">
+      <span class="sec-num">04</span>
+      <h2>발표 전 처리 순서</h2>
+    </div>
+    <p class="sec-note">
+      1번 하나만 고치면 PPT 내용이 사실이 됩니다. 나머지는 발표 완성도 문제입니다.
+    </p>
+
+    <div class="actions">
+      <div class="action">
+        <div>
+          <h3>「내 신청내역」을 서버 응답으로 갈아끼우기</h3>
+          <p>
+            <code>MyApplicationsView</code> 가 <code>GET /api/enrollments/my</code> 를 호출하고,
+            <code>PENDING</code> 은 「접수 처리 중」, <code>ACTIVE</code> 는 「접수완료」로 표시하게 합니다.
+            2번 상태 매핑이 여기서 함께 해결되고, 슬라이드 12 시연 시나리오가 그대로 재현됩니다.
+          </p>
+          <div class="refs">불일치 1 · 2 해소</div>
+        </div>
+      </div>
+      <div class="action">
+        <div>
+          <h3>사용자에게 보이는 문구에서 강의 용어 걷어내기</h3>
+          <p>
+            예외 메시지 두 줄을 청약 문구로 바꾸고, 카테고리 매핑을 지역 기준으로 교체합니다.
+            발표 중 실수로 중복 신청해도 어색한 문구가 뜨지 않습니다.
+          </p>
+          <div class="refs">불일치 5 해소</div>
+        </div>
+      </div>
+      <div class="action">
+        <div>
+          <h3>시연 계정 초기화 &amp; PENDING 복구 경로 확보</h3>
+          <p>
+            리허설로 남은 PENDING 레코드를 정리하고, 중복 검사에서 PENDING을 어떻게 다룰지 정합니다.
+            최소한 발표 직전 시연 계정만이라도 비워 두면 됩니다.
+          </p>
+          <div class="refs">불일치 7 대응</div>
+        </div>
+      </div>
+      <div class="action">
+        <div>
+          <h3>슬라이드 8 다이어그램과 11페이지 채우기</h3>
+          <p>
+            Kafka에서 Recommend로 가는 화살표와 신청자 수 증가 호출을 다이어그램에 추가하고,
+            슬라이드 11에 실제 Request / Response 예시를 넣습니다.
+          </p>
+          <div class="refs">불일치 6 · 8 해소</div>
+        </div>
+      </div>
+      <div class="action">
+        <div>
+          <h3>취소 버튼과 결제 금액 정리</h3>
+          <p>
+            취소 API를 추가하거나, 이번 발표 범위가 아니라면 버튼을 숨깁니다.
+            결제 금액은 공고의 분양가를 쓰거나 접수 수수료 개념으로 정리합니다.
+          </p>
+          <div class="refs">불일치 3 · 4 해소</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    점검 대상 &mdash; 애자일 방법론과 MSA 실습 / 통합 청약 플랫폼 발표자료<br>
+    대조 코드 &mdash; msa-lecture (api-gateway, enrollment-service, payment-service, course-service, recommend-service, vue-frontend)<br>
+    파일·라인 표기는 점검 시점 기준입니다.
+  </footer>
+
+</div>
+</body>
+</html>
